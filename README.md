@@ -299,7 +299,13 @@ cmporter web --port 8790     # 换端口
 cmporter web --no-open       # 不自动打开浏览器
 ```
 
-然后打开 <http://127.0.0.1:8787>。页面包含：
+然后打开 <http://127.0.0.1:8787>。页面支持深色 / 亮色主题，右上角一键切换。
+
+![WebUI 深色主题](docs/images/webui-dark.jpg)
+
+![WebUI 亮色主题](docs/images/webui-light.jpg)
+
+页面包含：
 
 - **顶部**：账号信息与扫码登录入口（弹窗扫码）；
 - **概览卡**：账号、云盘用量（meter 条 / 已用 / 上限）、音源、每日自动同步状态；

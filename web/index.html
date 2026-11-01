@@ -1,158 +1,418 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="dark">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>cloud-music-porter</title>
+<meta name="color-scheme" content="dark light" />
+<meta name="theme-color" content="#08070d" />
+<meta name="description" content="cloud-music-porter — 把你自己拥有的音频送进网易云音乐云盘。自动扫描 VIP 受限歌曲、用自备音源补齐、本地优先、开源。" />
+<title>cloud-music-porter · 云盘搬运工</title>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
 <link rel="stylesheet" href="/static/style.css" />
+<script>
+  try {
+    var q = new URLSearchParams(location.search).get('theme');
+    var t = q || localStorage.getItem('cmporter.theme') || 'dark';
+    document.documentElement.dataset.theme = t === 'light' ? 'light' : 'dark';
+  } catch (error) {}
+</script>
 </head>
 <body>
+
+<div class="backdrop" aria-hidden="true">
+  <div class="aurora aurora-a"></div>
+  <div class="aurora aurora-b"></div>
+  <div class="aurora aurora-c"></div>
+  <div class="grid-glow"></div>
+</div>
+
+<svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="logo-mark" viewBox="0 0 48 48">
+    <defs>
+      <linearGradient id="logoGrad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#ff8a5c" />
+        <stop offset="1" stop-color="#ffc46b" />
+      </linearGradient>
+    </defs>
+    <rect width="48" height="48" rx="13" fill="url(#logoGrad)" />
+    <circle cx="24" cy="24" r="13.4" fill="none" stroke="rgba(26,15,12,.42)" stroke-width="1.2" />
+    <circle cx="24" cy="24" r="9.3" fill="none" stroke="rgba(26,15,12,.26)" stroke-width="1" />
+    <circle cx="24" cy="24" r="6" fill="#1a0f0c" />
+    <path d="M22.3 21.3v5.4l4.6-2.7z" fill="#ffd9a8" />
+  </symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
+  <symbol id="i-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3z"/><path d="M21 21h-3v-3"/><path d="M14 21h2M21 14v2"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></symbol>
+  <symbol id="i-scan" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></symbol>
+  <symbol id="i-github" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-1-2.6c3.1-.3 6.4-1.5 6.4-7A5.4 5.4 0 0 0 20 4.8 5 5 0 0 0 19.9 1S18.7.7 16 2.5a13.4 13.4 0 0 0-7 0C6.3.7 5.1 1 5.1 1A5 5 0 0 0 5 4.8 5.4 5.4 0 0 0 3.6 8.5c0 5.5 3.3 6.7 6.4 7a3.4 3.4 0 0 0-1 2.6V22"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M17.5 19a4.5 4.5 0 0 0 .6-9A6 6 0 0 0 6.5 11.6 3.7 3.7 0 0 0 7 19z"/></symbol>
+  <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+  <symbol id="i-terminal" viewBox="0 0 24 24"><path d="m4 17 6-6-6-6"/><path d="M12 19h8"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-database" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="7" rx="2"/><rect x="2" y="13" width="20" height="7" rx="2"/><path d="M6 7.5h.01M6 16.5h.01"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M1 14h6M9 8h6M17 16h6"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></symbol>
+</svg>
+
 <header class="topbar">
-  <div class="brand">
-    <span class="logo">♪</span>
-    <div>
-      <div class="title">cloud-music-porter</div>
-      <div class="subtitle" id="appSubtitle">把你自己拥有的音频送进网易云音乐云盘</div>
-    </div>
-  </div>
+  <a class="brand" href="/" aria-label="cloud-music-porter 首页">
+    <span class="logo"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-mark"/></svg></span>
+    <span class="brand-text">
+      <span class="title">cloud-music-porter <span class="ver" id="appVersion">v0.1.2</span></span>
+      <span class="subtitle" id="appSubtitle">本地优先的网易云云盘搬运工</span>
+    </span>
+  </a>
   <div class="top-actions">
-    <button id="btnLogin" class="btn ghost">扫码登录</button>
-    <button id="btnRefresh" class="btn">刷新</button>
+    <span class="top-account" id="topAccount" title="当前登录账号">
+      <span class="live-dot"></span>
+      <span id="topAccountName">未登录</span>
+    </span>
+    <button class="icon-btn" id="btnTheme" type="button" aria-label="切换主题" title="切换亮色 / 暗色">
+      <svg class="icon icon-sun" aria-hidden="true"><use href="#i-sun"/></svg>
+      <svg class="icon icon-moon" aria-hidden="true"><use href="#i-moon"/></svg>
+    </button>
+    <a class="btn ghost" href="https://github.com/publieople/cloud-music-porter" target="_blank" rel="noreferrer">
+      <svg class="icon" aria-hidden="true"><use href="#i-github"/></svg><span class="btn-label">GitHub</span>
+    </a>
+    <button id="btnLogin" class="btn ghost" type="button">
+      <svg class="icon" aria-hidden="true"><use href="#i-qr"/></svg><span class="btn-label">扫码登录</span>
+    </button>
+    <button id="btnRefresh" class="btn" type="button">
+      <svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg><span class="btn-label">刷新</span>
+    </button>
   </div>
 </header>
 
 <main>
-  <section class="grid overview">
-    <div class="card">
-      <div class="card-title">账号</div>
-      <div class="big" id="accountName">未登录</div>
-      <div class="muted" id="accountMeta">运行 cmporter login 或点右上角扫码登录</div>
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow"><span class="pulse-dot"></span>LOCAL-FIRST · OPEN SOURCE · MIT</div>
+      <h1>把 VIP 歌，<br /><span class="grad-text">搬进你自己的云盘</span></h1>
+      <p class="lede">自动扫描「我喜欢的音乐」，挑出 VIP 受限曲目，用你自备的音源补进网易云音乐云盘。多数歌曲 <strong>0 字节秒传</strong>，听完还是原来的网易云。</p>
+      <div class="hero-actions">
+        <button class="btn primary big" id="btnHeroSync" type="button">立即同步我的歌单<svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+        <button class="btn ghost big" id="btnHeroScan" type="button"><svg class="icon" aria-hidden="true"><use href="#i-scan"/></svg>先扫描看看</button>
+      </div>
+      <ul class="hero-facts">
+        <li><b>0 字节</b><span>秒传导入</span></li>
+        <li><b>本地</b><span>cookie 不出本机</span></li>
+        <li><b>MIT</b><span>开源可改</span></li>
+      </ul>
     </div>
-    <div class="card">
-      <div class="card-title">音乐云盘</div>
-      <div class="big" id="cloudCount">—</div>
-      <div class="meter"><div class="meter-fill" id="cloudMeter"></div></div>
-      <div class="muted" id="cloudMeta">容量读取中…</div>
-    </div>
-    <div class="card">
-      <div class="card-title">音源</div>
-      <div class="rowline"><span>LX Music</span><span id="lxMeta" class="muted">读取中…</span></div>
-      <div class="rowline"><span>MusicFree</span><span id="mfMeta" class="muted">读取中…</span></div>
-    </div>
-    <div class="card">
-      <div class="card-title">每日自动同步</div>
-      <div class="big" id="serviceState">—</div>
-      <div class="muted" id="serviceMeta">读取中…</div>
+
+    <div class="hero-art" aria-hidden="true">
+      <div class="art-glow"></div>
+      <div class="disc">
+        <div class="disc-grooves"></div>
+        <div class="disc-sheen"></div>
+        <div class="disc-label">
+          <svg class="disc-logo" viewBox="0 0 48 48"><use href="#logo-mark"/></svg>
+          <span>CMP</span>
+          <small>cloud music</small>
+        </div>
+      </div>
+      <div class="float-card now-playing">
+        <div class="np-cover">
+          <span class="np-note">♪</span>
+          <span class="np-wave"><i></i><i></i><i></i><i></i><i></i></span>
+        </div>
+        <div class="np-text"><b>Дедлайн</b><small>MiatriSs · FLAC</small></div>
+        <span class="pill ok">已秒传</span>
+      </div>
+      <div class="float-card storage-card">
+        <div class="sc-head"><svg class="icon"><use href="#i-cloud"/></svg><span>音乐云盘</span><b id="heroCloudPct">—</b></div>
+        <div class="sc-size" id="heroCloudSize">— / —</div>
+        <div class="meter slim"><i id="heroCloudBar"></i></div>
+        <small id="heroCloudLeft">正在读取容量…</small>
+      </div>
+      <div class="float-card delivered-card">
+        <span class="dc-icon"><svg class="icon"><use href="#i-check"/></svg></span>
+        <div><b><span id="heroDelivered">—</span> 条</b><small>云盘已入库</small></div>
+      </div>
+      <span class="aurora-ring ring-a"></span>
+      <span class="aurora-ring ring-b"></span>
     </div>
   </section>
 
-  <section class="grid two">
-    <div class="card">
-      <div class="card-title">扫描 / 同步</div>
-      <div class="formrow">
-        <label>处理范围</label>
-        <select id="target">
+  <section class="stats" aria-label="总览">
+    <article class="card stat">
+      <div class="stat-head">
+        <span class="icon-tile"><svg class="icon"><use href="#i-user"/></svg></span>
+        <span class="stat-label">账号</span>
+        <span class="dot" id="accountDot" data-state="idle"></span>
+      </div>
+      <div class="account-body">
+        <span class="avatar" id="accountAvatar">?</span>
+        <div class="account-text">
+          <div class="big" id="accountName">未登录</div>
+          <div class="muted" id="accountMeta">点「扫码登录」或运行 cmporter login</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card stat">
+      <div class="stat-head">
+        <span class="icon-tile"><svg class="icon"><use href="#i-cloud"/></svg></span>
+        <span class="stat-label">音乐云盘</span>
+        <span class="stat-extra" id="cloudPercent">—</span>
+      </div>
+      <div class="big" id="cloudCount">—</div>
+      <div class="meter"><i id="cloudMeter"></i></div>
+      <div class="muted" id="cloudMeta">容量读取中…</div>
+    </article>
+
+    <article class="card stat">
+      <div class="stat-head">
+        <span class="icon-tile"><svg class="icon"><use href="#i-music"/></svg></span>
+        <span class="stat-label">音源</span>
+      </div>
+      <div class="source-list">
+        <div class="source-row">
+          <span class="src-badge lx">LX</span>
+          <div class="source-text"><b>LX Music</b><span class="muted" id="lxMeta">读取中…</span></div>
+          <span class="dot" id="lxDot" data-state="idle"></span>
+        </div>
+        <div class="source-row">
+          <span class="src-badge mf">MF</span>
+          <div class="source-text"><b>MusicFree</b><span class="muted" id="mfMeta">读取中…</span></div>
+          <span class="dot" id="mfDot" data-state="idle"></span>
+        </div>
+      </div>
+    </article>
+
+    <article class="card stat">
+      <div class="stat-head">
+        <span class="icon-tile"><svg class="icon"><use href="#i-clock"/></svg></span>
+        <span class="stat-label">每日自动同步</span>
+        <span class="dot" id="serviceDot" data-state="idle"></span>
+      </div>
+      <div class="big" id="serviceState">—</div>
+      <div class="muted" id="serviceMeta">读取中…</div>
+    </article>
+  </section>
+
+  <section class="workspace">
+    <div class="work-stack">
+    <article class="card control-card">
+      <header class="card-head">
+        <div>
+          <div class="card-kicker">TRANSFER</div>
+          <h2>搬运控制台</h2>
+        </div>
+        <span class="card-note">先扫描确认清单，再写入云盘</span>
+      </header>
+
+      <div class="field full">
+        <span class="field-label">处理范围</span>
+        <div class="segmented" id="targetSeg" role="tablist" aria-label="处理范围">
+          <button type="button" class="seg active" data-value="liked" role="tab" aria-selected="true">我喜欢的音乐</button>
+          <button type="button" class="seg" data-value="all" role="tab" aria-selected="false">全部歌单</button>
+          <button type="button" class="seg" data-value="playlist" role="tab" aria-selected="false">指定歌单</button>
+          <button type="button" class="seg" data-value="song" role="tab" aria-selected="false">歌曲 ID</button>
+          <button type="button" class="seg" data-value="query" role="tab" aria-selected="false">关键词</button>
+        </div>
+        <select id="target" class="sr-only" tabindex="-1" aria-hidden="true">
           <option value="liked">我喜欢的音乐</option>
           <option value="all">全部歌单（去重）</option>
           <option value="playlist">指定歌单</option>
           <option value="song">指定歌曲 id</option>
           <option value="query">搜索关键词</option>
         </select>
-        <input id="targetValue" class="hidden" placeholder="歌单链接或 id / 歌曲 id / 关键词" />
+        <input id="targetValue" class="hidden target-value" placeholder="歌单链接或 id / 歌曲 id / 关键词" />
       </div>
-      <div class="formrow">
-        <label>音质</label>
-        <select id="quality">
-          <option value="">跟随配置</option>
-          <option value="flac">FLAC（优先无损）</option>
-          <option value="320k">320k MP3</option>
-          <option value="128k">128k（省空间）</option>
-        </select>
-        <label class="inline"><input type="checkbox" id="vipOnly" /> 只看 VIP</label>
-        <label class="inline"><input type="checkbox" id="dryRun" /> 演练（不写云盘）</label>
+
+      <div class="form-grid">
+        <div class="field">
+          <label class="field-label" for="quality">音质</label>
+          <div class="select-wrap">
+            <select id="quality">
+              <option value="">跟随配置</option>
+              <option value="flac">FLAC 无损</option>
+              <option value="320k">320k MP3</option>
+              <option value="128k">128k 省空间</option>
+            </select>
+            <svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="maxGb">本次下载预算</label>
+          <div class="input-wrap">
+            <input id="maxGb" type="number" min="0" step="0.5" placeholder="留空 = 剩余 95%" />
+            <span class="suffix">GB</span>
+          </div>
+        </div>
+        <div class="field switches">
+          <span class="field-label">开关</span>
+          <div class="switch-row">
+            <label class="switch"><input type="checkbox" id="vipOnly" /><span class="switch-track"></span><span class="switch-text">只看 VIP</span></label>
+            <label class="switch"><input type="checkbox" id="dryRun" /><span class="switch-track"></span><span class="switch-text">演练模式</span></label>
+          </div>
+        </div>
       </div>
-      <div class="formrow">
-        <label>本次下载预算</label>
-        <input id="maxGb" type="number" min="0" step="0.5" placeholder="留空 = 云盘剩余 95%" />
-        <span class="muted">GB</span>
+
+      <div class="actions">
+        <button class="btn primary" id="btnSync" type="button">开始同步<svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+        <button class="btn" id="btnScan" type="button"><svg class="icon" aria-hidden="true"><use href="#i-scan"/></svg>扫描歌单</button>
+        <button class="btn ghost" id="btnMatch" type="button">匹配云盘副本</button>
+        <button class="btn ghost" id="btnDoctor" type="button">环境检查</button>
       </div>
-      <div class="buttons">
-        <button class="btn" id="btnScan">扫描</button>
-        <button class="btn primary" id="btnSync">开始同步</button>
-        <button class="btn" id="btnMatch">匹配云盘副本</button>
-        <button class="btn ghost" id="btnDoctor">环境检查</button>
+      <p class="hint">同步会先刷新 cookie、扫描歌单、比对云盘，只补缺失的歌；已存在的不会重复写入。</p>
+
+      <div class="control-flow" aria-hidden="true">
+        <div class="cf-step"><b>01</b><span>扫描歌单</span><small>只读，标出 VIP 受限曲目</small></div>
+        <svg class="icon cf-arrow"><use href="#i-arrow"/></svg>
+        <div class="cf-step"><b>02</b><span>音源补齐</span><small>LX Music / MusicFree 自动找音频</small></div>
+        <svg class="icon cf-arrow"><use href="#i-arrow"/></svg>
+        <div class="cf-step"><b>03</b><span>写入云盘</span><small>优先秒传，自动匹配回歌曲</small></div>
       </div>
+    </article>
+
+  <details class="card config-card" id="configCard">
+    <summary>
+      <div class="config-title">
+        <div class="card-kicker">ADVANCED</div>
+        <h2>高级配置</h2>
+      </div>
+      <span class="config-summary" id="configSummary">音质 · 音源目录 · 请求延迟</span>
+      <svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg>
+    </summary>
+    <div class="config-body">
+      <div class="config-grid">
+        <div class="field">
+          <label class="field-label" for="cfgQuality">默认音质</label>
+          <div class="select-wrap">
+            <select id="cfgQuality"><option value="flac">flac</option><option value="320k">320k</option><option value="128k">128k</option></select>
+            <svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="cfgSourceMode">音源模式</label>
+          <div class="select-wrap">
+            <select id="cfgSourceMode"><option value="auto">auto</option><option value="lx">lx</option><option value="musicfree">musicfree</option></select>
+            <svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg>
+          </div>
+        </div>
+        <div class="field span-2">
+          <label class="field-label" for="cfgLxDir">LX 数据目录</label>
+          <input id="cfgLxDir" placeholder="留空自动探测 LxDatas" />
+        </div>
+        <div class="field span-2">
+          <label class="field-label" for="cfgMfDir">MusicFree 插件目录</label>
+          <input id="cfgMfDir" placeholder="留空自动探测 musicfree-plugins" />
+        </div>
+        <div class="field">
+          <label class="field-label" for="cfgDelay">每首之间延迟</label>
+          <div class="input-wrap">
+            <input id="cfgDelay" type="number" min="0" step="100" />
+            <span class="suffix">ms</span>
+          </div>
+        </div>
+        <div class="field config-save">
+          <button class="btn" id="btnSaveConfig" type="button">保存配置</button>
+        </div>
+      </div>
+      <p class="config-path" id="configPath"></p>
+    </div>
+  </details>
     </div>
 
-    <div class="card">
-      <div class="card-title">每日自动同步</div>
-      <p class="muted">装好之后每天固定时间自动「刷新 cookie → 扫描喜欢的音乐 → 补齐云盘」，错过时间会在下次登录时补跑。</p>
-      <div class="formrow">
-        <label>每天</label>
-        <input id="serviceTime" type="time" value="08:30" />
-        <button class="btn" id="btnInstall">安装</button>
-        <button class="btn ghost" id="btnUninstall">卸载</button>
-      </div>
-      <div class="buttons">
-        <button class="btn" id="btnServiceRun">立即运行一次</button>
-        <button class="btn ghost" id="btnServiceStatus">查看状态</button>
-      </div>
-      <div class="muted" id="serviceHint"></div>
+    <div class="side-stack">
+      <article class="card auto-card">
+        <header class="card-head">
+          <div>
+            <div class="card-kicker">SCHEDULE</div>
+            <h2>每天自动补货</h2>
+          </div>
+          <span class="card-note">错过会补跑</span>
+        </header>
+
+        <div class="time-row">
+          <label class="field-label" for="serviceTime">每天</label>
+          <input id="serviceTime" type="time" value="08:30" />
+          <button class="btn" id="btnInstall" type="button">安装</button>
+          <button class="btn ghost" id="btnUninstall" type="button">卸载</button>
+        </div>
+
+        <div class="flow">
+          <div class="flow-item"><span class="flow-dot"></span><div><b id="serviceFlowTime">08:30</b><small>自动唤醒</small></div></div>
+          <div class="flow-item"><span class="flow-dot"></span><div><b>刷新 cookie</b><small>登录态自动续期</small></div></div>
+          <div class="flow-item"><span class="flow-dot"></span><div><b>扫描 → 补齐</b><small>只写缺失的 VIP 歌</small></div></div>
+        </div>
+
+        <div class="actions tight">
+          <button class="btn ghost" id="btnServiceRun" type="button"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg>立即运行一次</button>
+          <button class="btn ghost" id="btnServiceStatus" type="button">查看状态</button>
+        </div>
+        <p class="hint" id="serviceHint">默认按「凌晨关机、早上开机」的作息定在 08:30；时间可以在左侧改。</p>
+      </article>
+
+      <article class="card trust-card">
+        <header class="card-head">
+          <div>
+            <div class="card-kicker">SAFETY</div>
+            <h2>边界很清楚</h2>
+          </div>
+        </header>
+        <div class="trust-list">
+          <div class="trust-item"><span class="trust-icon"><svg class="icon"><use href="#i-lock"/></svg></span><div><b>cookie 不出本机</b><span>只保存在 ~/.cloud-music-porter</span></div></div>
+          <div class="trust-item"><span class="trust-icon"><svg class="icon"><use href="#i-shield"/></svg></span><div><b>WebUI 只监听回环</b><span>127.0.0.1，POST 校验请求头</span></div></div>
+          <div class="trust-item"><span class="trust-icon"><svg class="icon"><use href="#i-check"/></svg></span><div><b>不提供删除入口</b><span>删云盘只能用 CLI 显式指定 id</span></div></div>
+        </div>
+      </article>
     </div>
   </section>
 
-  <section class="card config-card">
-    <div class="card-title">配置</div>
-    <div class="formrow">
-      <label>默认音质</label>
-      <select id="cfgQuality"><option value="flac">flac</option><option value="320k">320k</option><option value="128k">128k</option></select>
-      <label>音源模式</label>
-      <select id="cfgSourceMode"><option value="auto">auto</option><option value="lx">lx</option><option value="musicfree">musicfree</option></select>
-    </div>
-    <div class="formrow">
-      <label>LX 数据目录</label>
-      <input id="cfgLxDir" placeholder="留空自动探测 LxDatas" />
-    </div>
-    <div class="formrow">
-      <label>MusicFree 插件目录</label>
-      <input id="cfgMfDir" placeholder="留空自动探测 musicfree-plugins" />
-    </div>
-    <div class="formrow">
-      <label>每首之间延迟</label>
-      <input id="cfgDelay" type="number" min="0" step="100" /> <span class="muted">毫秒</span>
-      <button class="btn" id="btnSaveConfig">保存配置</button>
-    </div>
-    <div class="muted" id="configPath"></div>
-  </section>
 </main>
 
 <footer class="footer">
-  <span id="footerText">MIT License · 本工具不提供任何音源，音源需自行配置</span>
+  <div class="foot-left">
+    <span class="foot-mark"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#logo-mark"/></svg></span>
+    <span id="footerText">MIT License · 本工具不提供任何音源，音源需自行配置</span>
+  </div>
+  <div class="foot-right">
+    <a href="https://github.com/publieople/cloud-music-porter" target="_blank" rel="noreferrer">GitHub</a>
+    <span id="footVersion">v0.1.2</span>
+  </div>
 </footer>
 
-<div class="drawer" id="drawer">
+<aside class="drawer hidden" id="drawer" aria-label="运行输出">
   <div class="drawer-head">
-    <span id="drawerTitle">输出</span>
-    <div>
+    <div class="drawer-title"><span class="term-dots"><i></i><i></i><i></i></span><span id="drawerTitle">运行输出</span></div>
+    <div class="drawer-actions">
       <span class="badge" id="jobState">待命</span>
-      <button class="btn ghost small" id="btnCloseDrawer">收起</button>
+      <button class="icon-btn small" id="btnCloseDrawer" type="button" aria-label="收起输出">
+        <svg class="icon"><use href="#i-x"/></svg>
+      </button>
     </div>
   </div>
   <pre class="log" id="log"></pre>
-</div>
-<button class="fab" id="btnOpenDrawer">输出日志</button>
+</aside>
+<button class="fab" id="btnOpenDrawer" type="button"><svg class="icon" aria-hidden="true"><use href="#i-terminal"/></svg>输出日志</button>
 
 <div class="modal hidden" id="modal">
-  <div class="modal-box">
-    <div class="modal-head">
-      <span>扫码登录网易云音乐</span>
-      <button class="btn ghost small" id="btnCloseModal">关闭</button>
-    </div>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-label="扫码登录">
+    <button class="icon-btn modal-close" id="btnCloseModal" type="button" aria-label="关闭">
+      <svg class="icon"><use href="#i-x"/></svg>
+    </button>
+    <div class="modal-kicker">SIGN IN</div>
+    <h3>扫码登录网易云音乐</h3>
+    <p class="muted">登录只为了读取歌单和写入你自己的云盘</p>
     <div class="qr-wrap"><img id="qrImg" alt="登录二维码" /></div>
-    <div class="muted" id="loginState">请用网易云音乐 App 扫码</div>
+    <div class="login-state" id="loginState">请用网易云音乐 App 扫码</div>
+    <p class="qr-tip">打开 App → 左上角扫一扫 → 确认登录</p>
   </div>
 </div>
 
+<noscript><p class="noscript">这个页面需要 JavaScript 才能读取账号与云盘数据。</p></noscript>
 <script src="/static/app.js" type="module"></script>
 </body>
 </html>

@@ -68,7 +68,7 @@ async function overview() {
     account: null,
     cloud: null,
     local: { imported: Object.keys(state.imported || {}).length, failed: Object.keys(state.failed || {}).length, runs: (state.runs || []).length },
-    service: { lastRunAt: serviceState.lastRunAt || null, lastOk: Boolean(serviceState.lastOk), lastMessage: serviceState.lastMessage || '', today: dateKey(), attemptsToday: serviceState.attempts && serviceState.attempts.date === dateKey() ? serviceState.attempts.count : 0 },
+    service: { lastRunAt: serviceState.lastRunAt || null, lastOk: Boolean(serviceState.lastOk), lastMessage: serviceState.lastMessage || '', lastSummary: serviceState.lastSummary || null, today: dateKey(), attemptsToday: serviceState.attempts && serviceState.attempts.date === dateKey() ? serviceState.attempts.count : 0 },
     sources: null,
   };
   if (meta.cookie) {
