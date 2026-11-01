@@ -286,6 +286,8 @@ Every trigger (`service run`) does the same four things:
 3. Refreshes the cookie first: on Windows it reads the NetEase desktop client login (DPAPI-protected local data), so keeping the client signed in avoids re-scanning the QR code; otherwise it falls back to the saved cookie;
 4. Runs `sync --liked` and records the result in `~/.cloud-music-porter/data/service-state.json`, with logs in `~/.cloud-music-porter/data/logs/service-YYYY-MM-DD.log`.
 
+`service run --dry-run` is only a rehearsal: nothing is written to the cloud drive, it does not consume that day's attempt budget, and it is **not** recorded as a successful sync for the day, so the real scheduled run later that day still happens.
+
 On Windows, installing a Scheduled Task may require the appropriate user permissions; read the output if it fails, or create the task manually in Task Scheduler.
 
 ### 8. Optional: local WebUI

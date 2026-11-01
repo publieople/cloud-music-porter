@@ -244,7 +244,8 @@ cloud-music-porter/
   2. 清理 `data/tmp/` 与 30 天前的 `service-*.log`；
   3. 刷新 cookie：Windows 尝试从本机网易云客户端的登录态（DPAPI 保护的本地数据）刷新，失败则回退到已保存的 cookie；
   4. 执行 `sync --liked`，摘要写入 `data/service-state.json`，日志追加到 `data/logs/service-YYYY-MM-DD.log`；
-- `cmporter service run [--dry-run] [--force]` 可手动触发同样的流程（其余参数取自配置），便于排查。
+- `cmporter service run [--dry-run] [--force]` 可手动触发同样的流程（其余参数取自配置），便于排查；
+- `--dry-run` 只演练：不写云盘、不消耗当天尝试次数，也不写 `lastRunDate / lastOk`（只更新 `lastDryRunAt` 与历史），因此不会让当天的真实定时同步被跳过。
 
 ## WebUI
 

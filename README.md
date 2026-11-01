@@ -287,6 +287,8 @@ cmporter service uninstall            # 卸载
 3. 先尝试刷新 cookie：Windows 会从本机网易云客户端的登录态（DPAPI 保护的本地数据）刷新，客户端保持登录就不用重新扫码；刷新失败或其他平台退回已保存的 cookie；
 4. 执行 `sync --liked`，结果写入 `~/.cloud-music-porter/data/service-state.json`，日志在 `~/.cloud-music-porter/data/logs/service-YYYY-MM-DD.log`。
 
+`service run --dry-run` 只是演练：不写云盘，也不计入当天尝试次数、不会被记成「今天已成功同步」，所以当天晚些的真实定时同步仍会照常执行。
+
 Windows 上安装计划任务可能需要当前用户具备相应权限；失败时看命令输出的提示，或用系统「任务计划程序」手动创建。
 
 ### 8. 可选：本地 WebUI

@@ -4,6 +4,7 @@ import { userAccount, cloudStats, setCookie } from '../core/netease.js';
 import { sync } from '../sync.js';
 import { refreshCookieFromClient } from './cookie-refresh.js';
 import { createLogger, loadServiceState, saveServiceState, dateKey, appendLog, cleanupTmp, cleanupLogs, LOG_DIR } from './state.js';
+import { recordRunOutcome } from './outcome.js';
 
 function today() {
   return dateKey();
@@ -58,19 +59,21 @@ export async function dailyRun(options) {
       return { skipped: true, ok: true, reason: 'already-ok-today' };
     }
     const allowance = attemptsAllowed(state, cfg);
-    if (!opts.force && !allowance.allowed) {
-      const message = '今天已达尝试上限（' + allowance.max + ' 次），跳过';
-      appendLog(key, message);
-      console.log('· ' + message + '。');
-      return { skipped: true, ok: false, reason: 'attempt-limit' };
+    if (!opts.dryRun) {
+      if (!opts.force && !allowance.allowed) {
+        const message = '今天已达尝试上限（' + allowance.max + ' 次），跳过';
+        appendLog(key, message);
+        console.log('· ' + message + '。');
+        return { skipped: true, ok: false, reason: 'attempt-limit' };
+      }
+      state.attempts.count += 1;
+      state.attempts.date = key;
+      state.lastRunAt = new Date().toISOString();
+      state.lastRunAtMs = Date.now();
+      saveServiceState(state);
     }
-    state.attempts.count += 1;
-    state.attempts.date = key;
-    state.lastRunAt = new Date().toISOString();
-    state.lastRunAtMs = Date.now();
-    saveServiceState(state);
 
-    console.log('· 配置：quality=' + cfg.quality + '，sourceMode=' + cfg.sourceMode + '，每天最多尝试 ' + allowance.max + ' 次');
+    console.log('· 配置：quality=' + cfg.quality + '，sourceMode=' + cfg.sourceMode + '，' + (opts.dryRun ? '演练模式（不写云盘、不计入当天尝试次数）' : '每天最多尝试 ' + allowance.max + ' 次'));
     console.log('· 清理旧临时文件：' + cleanupTmp() + ' 个，旧日志：' + cleanupLogs() + ' 个');
     await ensureLogin(state);
     const stats = await cloudStats();
@@ -86,21 +89,25 @@ export async function dailyRun(options) {
       delayMs: opts.delayMs,
     });
     const summary = (result && result.summary) || {};
-    const imported = Number(summary.imported || 0);
-    const failed = Number(summary.failed || 0);
-    const skipped = Number(summary.skipped || 0);
-    state.lastRunDate = key;
-    state.lastOk = failed === 0;
-    state.lastMessage = '新增 ' + imported + ' 首，失败 ' + failed + ' 首，跳过 ' + skipped + ' 首';
-    state.lastSummary = summary;
-    state.history = (state.history || []).concat([{ date: key, at: Date.now(), mode, ok: state.lastOk, imported, failed, skipped }]).slice(-90);
+    const outcome = recordRunOutcome(state, { key, dryRun: Boolean(opts.dryRun), summary });
     saveServiceState(state);
-    appendLog(key, state.lastMessage + (state.lastOk ? '（成功）' : '（有失败）'));
-    console.log('· 完成：' + state.lastMessage);
-    if (!state.lastOk) exitCode = 1;
-    return { ok: state.lastOk, summary, exitCode };
+    if (outcome.dryRun) {
+      const targets = result && result.targets !== undefined ? result.targets : 0;
+      appendLog(key, '演练完成：待同步 ' + targets + ' 首，未写入云盘');
+      console.log('· 演练完成：待同步 ' + targets + ' 首（未写入云盘，不记为今天已同步）');
+      return { ok: true, dryRun: true, summary, exitCode: 0 };
+    }
+    appendLog(key, outcome.message + (outcome.ok ? '（成功）' : '（有失败）'));
+    console.log('· 完成：' + outcome.message);
+    if (!outcome.ok) exitCode = 1;
+    return { ok: outcome.ok, summary, exitCode };
   } catch (error) {
     const message = (error && error.message) || String(error);
+    if (opts.dryRun) {
+      appendLog(key, '演练失败：' + message);
+      console.error('· 演练失败：' + message);
+      return { ok: false, dryRun: true, error: message, exitCode: 1 };
+    }
     state.lastRunDate = key;
     state.lastOk = false;
     state.lastMessage = '失败：' + message;

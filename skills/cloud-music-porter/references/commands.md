@@ -52,8 +52,8 @@
 | --- | --- |
 | `cmporter service status` | 查看计划任务 / 上次结果 / 最近日志 |
 | `cmporter service install --time 08:30` | 安装每日自动同步 |
-| `cmporter service install --time 08:30 --dry-run` | 装任务但先演练 |
-| `cmporter service run --dry-run --force` | 立即跑一次 |
+| `cmporter service run --dry-run` | 演练一次：不写云盘，也不记为当天成功 |
+| `cmporter service run --force` | 强制立即真实跑一次（忽略当天成功/次数限制） |
 | `cmporter service uninstall` | 卸载 |
 
 ## 常用选项
