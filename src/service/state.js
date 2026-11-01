@@ -110,7 +110,10 @@ export function printServiceStatus(cfg, platformInfo) {
   if (!state.lastRunAt) console.log('  上次结果：从未运行');
   else console.log('  上次结果：' + (state.lastOk ? '成功' : '失败') + ' —— ' + (state.lastMessage || '无记录'));
   if (state.lastSummary) console.log('  上次明细：' + JSON.stringify(state.lastSummary));
-  if (state.lastDryRunAt) console.log('  上次演练：' + stamp(state.lastDryRunAt) + '（未写入云盘，不记为当天成功）');
+  if (state.lastDryRunAt) {
+    const targets = Number(state.lastDryRunTargets);
+    console.log('  上次演练：' + stamp(state.lastDryRunAt) + (Number.isFinite(targets) ? '（待同步 ' + targets + ' 首，未写入云盘，不记为当天成功）' : '（未写入云盘，不记为当天成功）'));
+  }
   console.log('  登录 cookie：' + (meta.updatedAt ? stamp(meta.updatedAt) : '未知') + '（来源 ' + (meta.source || '未知') + '）');
   const cookieState = state.cookie || {};
   if (cookieState.refreshOk) console.log('  客户端 cookie 自动刷新：上次成功（' + (cookieState.updatedAt ? stamp(cookieState.updatedAt) : '') + '）');

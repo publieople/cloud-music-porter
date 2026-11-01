@@ -5,7 +5,8 @@ export function recordRunOutcome(state, options) {
   const opts = options || {};
   const key = opts.key;
   const summary = opts.summary && typeof opts.summary === 'object' ? opts.summary : {};
-  const imported = Number(summary.imported || 0);
+  // imported 同时统计秒传导入与真上传成功（sync() 把 uploaded 单独计数）
+  const imported = Number(summary.imported || 0) + Number(summary.uploaded || 0);
   const failed = Number(summary.failed || 0);
   const skipped = Number(summary.skipped || 0);
   const mode = opts.dryRun ? 'dry-run' : 'real';
@@ -13,11 +14,13 @@ export function recordRunOutcome(state, options) {
   state.history = (state.history || []).concat([entry]).slice(-90);
   if (opts.dryRun) {
     state.lastDryRunAt = new Date().toISOString();
-    return { dryRun: true, ok: true, imported: 0, failed: 0, skipped: 0, message: '演练完成（未写入云盘）' };
+    const targets = Number(opts.targets);
+    state.lastDryRunTargets = Number.isFinite(targets) ? targets : 0;
+    return { dryRun: true, ok: true, imported: 0, failed: 0, skipped: 0, targets: state.lastDryRunTargets, message: '演练完成（未写入云盘）' };
   }
   state.lastRunDate = key;
   state.lastOk = failed === 0;
   state.lastMessage = '新增 ' + imported + ' 首，失败 ' + failed + ' 首，跳过 ' + skipped + ' 首';
-  state.lastSummary = summary;
+  state.lastSummary = { imported, failed, skipped };
   return { dryRun: false, ok: state.lastOk, imported, failed, skipped, message: state.lastMessage };
 }

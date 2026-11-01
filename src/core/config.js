@@ -24,7 +24,7 @@ export const P = {
 export const APP = {
   name: 'cloud-music-porter',
   cli: 'cmporter',
-  version: '0.1.1',
+  version: '0.1.2',
   repo: 'https://github.com/publieople/cloud-music-porter',
 };
 

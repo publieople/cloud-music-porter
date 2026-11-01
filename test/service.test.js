@@ -57,3 +57,27 @@ test('recordRunOutcome：summary 缺省按 0 处理', () => {
   assert.equal(out.skipped, 0);
   assert.equal(state.lastMessage, '新增 0 首，失败 0 首，跳过 0 首');
 });
+
+test('recordRunOutcome：真上传（uploaded）也计入「新增」', () => {
+  const state = {};
+  const out = recordRunOutcome(state, { key: '2026-11-01', summary: { imported: 1, uploaded: 2, failed: 0, skipped: 0 } });
+  assert.equal(out.imported, 3);
+  assert.equal(state.lastMessage, '新增 3 首，失败 0 首，跳过 0 首');
+  assert.deepEqual(state.lastSummary, { imported: 3, failed: 0, skipped: 0 });
+});
+
+test('recordRunOutcome：无待同步歌曲（sync 返回 { synced: 0 }）也写入可读明细', () => {
+  const state = {};
+  recordRunOutcome(state, { key: '2026-11-01', summary: { synced: 0 } });
+  assert.equal(state.lastMessage, '新增 0 首，失败 0 首，跳过 0 首');
+  assert.deepEqual(state.lastSummary, { imported: 0, failed: 0, skipped: 0 });
+});
+
+test('recordRunOutcome：dry-run 记录待同步数量，仍不写当天成功状态', () => {
+  const state = {};
+  const out = recordRunOutcome(state, { key: '2026-11-01', dryRun: true, summary: { dryRun: true, targets: 3 }, targets: 3 });
+  assert.equal(state.lastRunDate, undefined);
+  assert.equal(state.lastOk, undefined);
+  assert.equal(state.lastDryRunTargets, 3);
+  assert.equal(out.targets, 3);
+});

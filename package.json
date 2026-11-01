@@ -1,6 +1,6 @@
 {
   "name": "cloud-music-porter",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "把你自己合法获取的音频送进网易云音乐云盘 —— 自动检测 VIP 受限歌曲、从你自备的音源（LX Music 自定义源 / MusicFree 插件）取音频、秒传或上传到云盘。",
   "type": "module",
   "main": "src/cli.js",

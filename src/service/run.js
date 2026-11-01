@@ -88,11 +88,12 @@ export async function dailyRun(options) {
       maxGb: opts.maxGb,
       delayMs: opts.delayMs,
     });
-    const summary = (result && result.summary) || {};
-    const outcome = recordRunOutcome(state, { key, dryRun: Boolean(opts.dryRun), summary });
+    // 无待同步歌曲时 sync() 返回 { synced: 0 }（没有 summary 字段），这里统一成可统计的对象
+    const summary = result && typeof result === 'object' ? (result.summary || result) : {};
+    const outcome = recordRunOutcome(state, { key, dryRun: Boolean(opts.dryRun), summary, targets: result && result.targets });
     saveServiceState(state);
     if (outcome.dryRun) {
-      const targets = result && result.targets !== undefined ? result.targets : 0;
+      const targets = outcome.targets !== undefined ? outcome.targets : 0;
       appendLog(key, '演练完成：待同步 ' + targets + ' 首，未写入云盘');
       console.log('· 演练完成：待同步 ' + targets + ' 首（未写入云盘，不记为今天已同步）');
       return { ok: true, dryRun: true, summary, exitCode: 0 };
