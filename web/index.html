@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>cloud-music-porter</title>
+<link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">♪</span>
+    <div>
+      <div class="title">cloud-music-porter</div>
+      <div class="subtitle" id="appSubtitle">把你自己拥有的音频送进网易云音乐云盘</div>
+    </div>
+  </div>
+  <div class="top-actions">
+    <button id="btnLogin" class="btn ghost">扫码登录</button>
+    <button id="btnRefresh" class="btn">刷新</button>
+  </div>
+</header>
+
+<main>
+  <section class="grid overview">
+    <div class="card">
+      <div class="card-title">账号</div>
+      <div class="big" id="accountName">未登录</div>
+      <div class="muted" id="accountMeta">运行 cmporter login 或点右上角扫码登录</div>
+    </div>
+    <div class="card">
+      <div class="card-title">音乐云盘</div>
+      <div class="big" id="cloudCount">—</div>
+      <div class="meter"><div class="meter-fill" id="cloudMeter"></div></div>
+      <div class="muted" id="cloudMeta">容量读取中…</div>
+    </div>
+    <div class="card">
+      <div class="card-title">音源</div>
+      <div class="rowline"><span>LX Music</span><span id="lxMeta" class="muted">读取中…</span></div>
+      <div class="rowline"><span>MusicFree</span><span id="mfMeta" class="muted">读取中…</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">每日自动同步</div>
+      <div class="big" id="serviceState">—</div>
+      <div class="muted" id="serviceMeta">读取中…</div>
+    </div>
+  </section>
+
+  <section class="grid two">
+    <div class="card">
+      <div class="card-title">扫描 / 同步</div>
+      <div class="formrow">
+        <label>处理范围</label>
+        <select id="target">
+          <option value="liked">我喜欢的音乐</option>
+          <option value="all">全部歌单（去重）</option>
+          <option value="playlist">指定歌单</option>
+          <option value="song">指定歌曲 id</option>
+          <option value="query">搜索关键词</option>
+        </select>
+        <input id="targetValue" class="hidden" placeholder="歌单链接或 id / 歌曲 id / 关键词" />
+      </div>
+      <div class="formrow">
+        <label>音质</label>
+        <select id="quality">
+          <option value="">跟随配置</option>
+          <option value="flac">FLAC（优先无损）</option>
+          <option value="320k">320k MP3</option>
+          <option value="128k">128k（省空间）</option>
+        </select>
+        <label class="inline"><input type="checkbox" id="vipOnly" /> 只看 VIP</label>
+        <label class="inline"><input type="checkbox" id="dryRun" /> 演练（不写云盘）</label>
+      </div>
+      <div class="formrow">
+        <label>本次下载预算</label>
+        <input id="maxGb" type="number" min="0" step="0.5" placeholder="留空 = 云盘剩余 95%" />
+        <span class="muted">GB</span>
+      </div>
+      <div class="buttons">
+        <button class="btn" id="btnScan">扫描</button>
+        <button class="btn primary" id="btnSync">开始同步</button>
+        <button class="btn" id="btnMatch">匹配云盘副本</button>
+        <button class="btn ghost" id="btnDoctor">环境检查</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">每日自动同步</div>
+      <p class="muted">装好之后每天固定时间自动「刷新 cookie → 扫描喜欢的音乐 → 补齐云盘」，错过时间会在下次登录时补跑。</p>
+      <div class="formrow">
+        <label>每天</label>
+        <input id="serviceTime" type="time" value="08:30" />
+        <button class="btn" id="btnInstall">安装</button>
+        <button class="btn ghost" id="btnUninstall">卸载</button>
+      </div>
+      <div class="buttons">
+        <button class="btn" id="btnServiceRun">立即运行一次</button>
+        <button class="btn ghost" id="btnServiceStatus">查看状态</button>
+      </div>
+      <div class="muted" id="serviceHint"></div>
+    </div>
+  </section>
+
+  <section class="card config-card">
+    <div class="card-title">配置</div>
+    <div class="formrow">
+      <label>默认音质</label>
+      <select id="cfgQuality"><option value="flac">flac</option><option value="320k">320k</option><option value="128k">128k</option></select>
+      <label>音源模式</label>
+      <select id="cfgSourceMode"><option value="auto">auto</option><option value="lx">lx</option><option value="musicfree">musicfree</option></select>
+    </div>
+    <div class="formrow">
+      <label>LX 数据目录</label>
+      <input id="cfgLxDir" placeholder="留空自动探测 LxDatas" />
+    </div>
+    <div class="formrow">
+      <label>MusicFree 插件目录</label>
+      <input id="cfgMfDir" placeholder="留空自动探测 musicfree-plugins" />
+    </div>
+    <div class="formrow">
+      <label>每首之间延迟</label>
+      <input id="cfgDelay" type="number" min="0" step="100" /> <span class="muted">毫秒</span>
+      <button class="btn" id="btnSaveConfig">保存配置</button>
+    </div>
+    <div class="muted" id="configPath"></div>
+  </section>
+</main>
+
+<footer class="footer">
+  <span id="footerText">MIT License · 本工具不提供任何音源，音源需自行配置</span>
+</footer>
+
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <span id="drawerTitle">输出</span>
+    <div>
+      <span class="badge" id="jobState">待命</span>
+      <button class="btn ghost small" id="btnCloseDrawer">收起</button>
+    </div>
+  </div>
+  <pre class="log" id="log"></pre>
+</div>
+<button class="fab" id="btnOpenDrawer">输出日志</button>
+
+<div class="modal hidden" id="modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span>扫码登录网易云音乐</span>
+      <button class="btn ghost small" id="btnCloseModal">关闭</button>
+    </div>
+    <div class="qr-wrap"><img id="qrImg" alt="登录二维码" /></div>
+    <div class="muted" id="loginState">请用网易云音乐 App 扫码</div>
+  </div>
+</div>
+
+<script src="/static/app.js" type="module"></script>
+</body>
+</html>

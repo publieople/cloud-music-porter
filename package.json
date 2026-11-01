@@ -1,0 +1,56 @@
+{
+  "name": "cloud-music-porter",
+  "version": "0.1.0",
+  "description": "把你自己合法获取的音频送进网易云音乐云盘 —— 自动检测 VIP 受限歌曲、从你自备的音源（LX Music 自定义源 / MusicFree 插件）取音频、秒传或上传到云盘。",
+  "type": "module",
+  "main": "src/cli.js",
+  "bin": {
+    "cmporter": "src/cli.js",
+    "cloud-music-porter": "src/cli.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "login": "node src/cli.js login",
+    "status": "node src/cli.js status",
+    "scan": "node src/cli.js scan",
+    "sync": "node src/cli.js sync",
+    "web": "node src/cli.js web",
+    "doctor": "node src/cli.js doctor",
+    "test": "node --test"
+  },
+  "keywords": [
+    "netease",
+    "netease-cloud-music",
+    "lx-music",
+    "musicfree",
+    "cloud-disk",
+    "music",
+    "cli",
+    "webui"
+  ],
+  "license": "MIT",
+  "author": "publieople",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/publieople/cloud-music-porter.git"
+  },
+  "homepage": "https://github.com/publieople/cloud-music-porter#readme",
+  "bugs": {
+    "url": "https://github.com/publieople/cloud-music-porter/issues"
+  },
+  "private": true,
+  "dependencies": {
+    "@neteasecloudmusicapienhanced/api": "^4.41.1",
+    "qrcode": "^1.5.4",
+    "axios": "^1.20.0",
+    "cheerio": "^1.0.0",
+    "crypto-js": "^4.2.0",
+    "dayjs": "^1.11.13",
+    "big-integer": "^1.6.52",
+    "he": "^1.2.0",
+    "qs": "^6.14.0"
+  }
+}

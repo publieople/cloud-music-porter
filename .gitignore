@@ -1,0 +1,10 @@
+node_modules/
+data/
+config.json
+*.log
+logs/
+.DS_Store
+Thumbs.db
+coverage/
+.env
+*.tmp
