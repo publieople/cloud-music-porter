@@ -432,7 +432,7 @@ cmporter sync --liked --yes
 | 云盘实测 | 880 条 / 16.0GB，上限 60GB |
 | 本机音源 | MusicFree 17 个插件 + LX 2 个可用源，`doctor` 全绿 |
 | 每日服务 | Windows 计划任务上次运行结果 `0x0` |
-| 测试 | `npm test` 6 个测试文件 36 条用例全部通过 |
+| 测试 | `npm test` 7 个测试文件 44 条用例全部通过 |
 
 按 320k mp3 估算，单曲约 8–10MB，60GB 大约能放 5000 首；按 FLAC 估算，约 20–40MB 一首，60GB 大约 1500–3000 首。建议先小批量试跑再全量。
 
@@ -474,7 +474,7 @@ cmporter sync --liked --yes
 ## 开发与测试
 
 ```bash
-npm test                          # node --test，自动发现 test/*.test.js，6 个文件 36 条用例
+npm test                          # node --test，自动发现 test/*.test.js，7 个文件 44 条用例
 node --test test/matcher.test.js   # 单独跑某个测试文件
 ```
 

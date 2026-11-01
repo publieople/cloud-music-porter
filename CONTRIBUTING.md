@@ -74,7 +74,7 @@ node src/cli.js doctor
 npm test        # 等于 node --test（自动发现 test/*.test.js）
 ```
 
-目前测试为 6 个文件、36 条用例（配置、匹配、音频校验、同步编排、LX 源解析、CLI 冒烟）；CI（`.github/workflows/ci.yml`）在 Node 20 / 22 × Ubuntu / Windows / macOS 上跑 `npm ci && npm test`。
+目前测试为 7 个文件、44 条用例（配置、匹配、音频校验、同步编排、LX 源解析、定时任务状态记录、CLI 冒烟）；CI（`.github/workflows/ci.yml`）在 Node 20 / 22 × Ubuntu / Windows / macOS 上跑 `npm ci && npm test`。
 
 - 新增纯逻辑（例如歌名归一化、匹配打分、响应字段解析、分块上传计算）时，请同时补单测。
 - 涉及网络与账号的操作不要写进单测；需要演示时在 PR 描述里贴手动验证步骤和脱敏后的输出。

@@ -431,7 +431,7 @@ These come from the author account and machine. **They vary with account, source
 | Cloud drive (measured) | 880 entries / 16.0 GB used, 60 GB quota |
 | Local sources | 17 MusicFree plugins + 2 usable LX sources; `doctor` all green |
 | Daily job | Last Windows Scheduled Task result `0x0` |
-| Tests | `npm test` — 6 test files, 36 cases, all passing |
+| Tests | `npm test` — 7 test files, 44 cases, all passing |
 
 Rough estimates: 320k mp3 is about 8–10 MB per song, so 60 GB holds roughly 5,000 songs; FLAC at 20–40 MB per song holds roughly 1,500–3,000. Start with a small batch before going full scale.
 
@@ -473,7 +473,7 @@ Causes and troubleshooting are in [docs/faq.md](docs/faq.md).
 ## Development and testing
 
 ```bash
-npm test                          # node --test, auto-discovers test/*.test.js — 6 files, 36 cases
+npm test                          # node --test, auto-discovers test/*.test.js — 7 files, 44 cases
 node --test test/matcher.test.js   # run a single test file
 ```
 
